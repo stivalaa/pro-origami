@@ -1,0 +1,206 @@
+
+ptgraph2.py
+-----------
+
+ptgraph2 parses the output of STRIDE 
+(Frishman and Argos 1995 "Knowledge-Based Protein Secondary Structure
+Assignment" PROTEINS 23-566-579) or DSSP (Kabsch and Sander 1983) 
+to find helices and strands and builds 
+a graph structure from those using structure and H-bond information
+from STRIDE or DSSP, and uses BioPython Bio.PDB to parse ATOM cards from
+PDB files to get geometric information for Carbon-alpha atoms used in some 
+calculations.
+
+It is written in Python (2.5.1) and depends on some Python libraries:
+
+* BioPython 1.43 (http://www.biopython.org).
+
+  + mxTextTools (eGenix mx-Extension base 2.0.6) (http://www.egenix.com/files/python/egenix-mx-base-2.0.6.tar.gz)
+
+  + PyDot 0.9.10 (http://dkbza.org/data/pydot-0.9.10.tar.gz)
+
+    - PyParsing 1.4.6 (http://sourceforge.net/project/showfiles.php?group_id=97203&package_id=104017&release_id=500496)
+
+By default, DDOMAIN is used for domain identification. DDOMAIN is described in:
+
+    Zhou, Xue, Zhou 2007 'DDOMAIN: Dividing structures into domains using a
+    normalized domain-domain interaction profile' Protein Science 16:947-955.
+
+DDDOMAIN is available as a 64-bit linux executable and FORTRAN-77 source code
+from http://sparks.informatics.iupui.edu/Resource_files/DDOMAIN.tar.gz
+
+GraphViz itself is also required (http://www.research.att.com/sw/tools/graphviz)
+
+Note that a modified version of STRIDE is required. This in the stride/
+directory. The license allows this for academic use (see stride/stride.doc).
+
+Instead of using GraphViz (dot/neato), the default output 
+is now SVG for use with the Dunnart constraint-based
+diagram editor:
+
+  http://www.csse.monash.edu.au/~mwybrow/dunnart/
+
+Dunnart (0.14+SVN) has been modified to work with this by including
+strand and helix shapes, amongst other things (by Michael Wybrow).
+(Currently not generally available).
+
+Developed on Linux 2.6.9 (x86_64) with Python 2.5.1
+and BioPython 1.43 with Numeric 24.2
+
+Note that the Bio.PDB library needs to be patched with a modification
+I made to fix some things in PDBIO.py. This patch is in
+Bio.PDB.PDBIO.diff
+
+There is another diff to Bio.SCOP in order to correctly get all genetic
+domains in sequence nonredundant subsets, this pach is in 
+Bio.SCOP.__init__.diff
+
+Example usage:
+
+   ptgraph2.py 1QLP.pdb
+
+This will produce the 1QLP.svg file which is opened with dunnart which will
+automatically reformat it and can be edited there if required. Then save
+it and it can be re-opened with other SVG viewers or editors.
+
+
+pytableaucreate.py
+-------------------
+
+pytableaucreate.py is a program for generating protein tableaux in either
+numeric or standard tableau format (Kamat and Lesk (2007); Konagurthu et al
+(2008)). It uses routines (pttableau.py) also used internally by ptgraph2.
+
+
+domainfc.py, evaldd.py, traindomfc.py
+-------------------------------------
+
+These programs are for domain decomposition. They have ended up in the
+same directiory as ptgraph as the share some code (domainfc.py builds a
+protein SSE graph like ptgraph2, and they all use ptdomain.py).
+
+domainfc.py performs domain decomposition using clustering on a protein graph,
+            and also allows evaluation against a benchmark.
+evaldd.py allows evaluation of domain decomposition methods against each
+          other or a benchmark.
+traindomfc.py varies parameter and runs each parameter against a benchmark
+              to find best value, outputting a table for use in the R 
+              statistics package.
+
+fastcom.py is a wrapper for FastCommunity used by domainfc.py
+
+buildtableauxdb.py, tabsearchqpml.py, tabmatchpbool.py, tabsearchdp.py
+----------------------------------------------------------------------
+
+Programs for building tableaux database and querying it.
+tabsearchqpml.py depends on MATLAB and the mlabwrap library, and numpy:
+
+. mlablwrap
+  http://mlabwrap.sourceforge.net/
+  v1.0 was used.
+
+. numpy
+  http://numpy.scipy.org/
+  v1.01 was used
+          
+
+MATLAB Version 7.2.0.283 (R2006a) was used.
+
+tsevalfn.py
+-----------
+
+tsevalfn.py is used to evaluate the output of tabsearchqpml.py against
+SCOP (using Bio.SCOP) as ground truth, generating tables that can
+be read into R and plotted as ROC curves with plotsearchroc.r
+
+
+getnrpdblist.py
+---------------
+
+getnrpdblist.py is a program for generating a list of nonredundant PDB 
+identifiers from the output of CD-HIT, available from
+http://bioinformatics.ljcrf.edu/cd-hi
+
+convdbnumeric2ascii.py
+----------------------
+
+convert Numeric tableaux db built by buildtableauxdb -n to fixed width
+text file suitable for parsing by FORTRAN (or other) external programs
+such as tsrchn.
+
+convdbpacked2ascii.py
+---------------------
+
+convert PTTableauPacked tableaux db build by buildtableauxdb to text
+file suitable for parsing by FORTRAN (or other) external programs
+such as tsrchd.
+
+convdb2.py
+----------
+
+convert two database files, the PTTableauPacked tableaux db and a Numeric
+distance matrix db both build by buildtableauxdb to text file containing
+tableau and distance matrix for each entry suitable for parsing by
+FORTRAN (or other) external programs such as tsrchd.
+
+
+Directories
+-----------
+
+The webserver directory contains HTML and CGI code for the protein
+topology graph webserver. Note that the mapApp subdirectory there 
+contains the mapApp library from http://www.carto.net/papers/svg/gui/mapApp/
+as decribed in the README and license file therein.
+
+The doc directory contains documentation about protein topology cartoons.
+
+The slides directory contains seminar slides about protein topology cartoons.
+
+The TableauCreate and stride directories contain modified versions of
+TableauCreator and STRIDE, respectively. 
+(NOTE: TableauCreate is now obsolete, an internal implementation
+of protein tableaux is now used rather than running TableauCreator).
+
+The domain_doc directory contains docuemntation about domain decomposition
+(domainfc.py etc.)
+
+The domain_output directory contains output from traindom.py and domainfcy.py,
+used for determining parameters and performance and building graphs using R
+(from the Makefile in the domain_doc_directory).
+
+
+ADS
+Tue Jan  1 14:40:35 EST 2008
+$Id: README 3421 2010-03-10 03:39:37Z alexs $
+
+
+ptgraph.py (OBSOLETE)
+----------
+
+ptgraph.py is a program to draw two-dimensional graph representations of
+protein topology. It reads information from a PDB file and writes a graph
+rpresentation of the topological structure.
+
+It is written in Python and depends on some Python libraries:
+
+. pymmLib: python macromolecular library (1.0.0) http://pymmlib.sourceforge.net
+  Painter and Merritt 2004 "mmLib Python toolkit for manipulating annotated
+  structural models of biological macromolecules" J. Appl. Cryst. 37:174-178.
+
+. pydot: python interface to GraphViz (0.9.10) http://dkbza.org/pydot.html
+
+(note these libraries themselves depend on other libraries, e.g. numpy,
+these transitive dependencies are not listed here).
+
+GraphViz itself is also required (http://www.research.att.com/sw/tools/graphviz)
+
+
+Need to use DSSP or STRIDE to get secondary structure then other algorithms
+to get supersecondary structure (group strands into sheets etc.). But for
+now we assume there are HELIX and SHEET records in the PDB and use that
+to define the structure.
+
+Due to mmLib (and another half-dozen libraries I looked at) basically having
+far too many problems (mmLib seems to fail to build data structures from 
+SHEET records on most PDB files for instance) ptgraph.py reprsents a
+now abandoned approach.
