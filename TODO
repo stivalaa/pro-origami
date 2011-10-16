@@ -1,0 +1,302 @@
+bugfixes and enhancements yet to implement
+==========================================
+
+$Id: TODO 4157 2010-09-10 07:08:59Z alexs $
+
+Bugs
+----
+
+[ * 2PEE (domain 2PEE-3 by DDOMAIN decomposition): (another serpin) why is 
+    small sheet to the left  of instead of above the large sheet (as it is for 
+    1QLP etc. - these should be drawn the same way). ] DONE 10/2/08
+
+[ * helix clustering works well generally but some problems e.g. why are 
+  7API and 1MTP helix clusters different, they should be the same.
+  (more serpins to compare: 1QLP, 1SNG). ] DONE 9/2/08 - 
+                                           BUT SEE FIXME/TODO IN PTRELPOS.PY
+
+[ * Stop helix clusters from being placed between sheets (when -j selected) ]
+  DONE 27/2/08.
+
+[ * coredumps in TableauCreator ] NOW USING INTERNAL IMPLEMENTATION 4/2/08
+
+[ * sheet helix/cluster overlap eg 1JN9-1, 1K2X-2, 2ONJ-3, 1YTE ] 
+  NO LONGER HAPPENS ON LATEST VERSION (R1083, 16/2/08 OR EVEN R1068, 11/2/08)
+  FIXED BY HELIX CLUSTERING CHANGES.
+
+[ * problem with barrel breaking (arbitrary) eg 1JDU sometimes can cause
+  assertion failures (CATH domain C1). Need to implement proper cycle
+  detection (see flower94, flower95, paton69) ] DONE 22/2/08 using back
+                                                edges from DFS for cycle
+                                                detection - still somewhat
+                                                arbitrary but better. See
+                                                notes 22/2/08 for details on
+                                                1JDU-C1 Rossman fold.
+
+[ * (Related to previous point) With the new cycle detection/breaking method,
+    1BBP-1 is wrong, was better before. Still need more work on deciding
+    which edge to break. (see notes 22/2/08). Also 1UPS-2. ] DONE 27/2/08
+                                                             See notes 27/2/08
+                                                             and above, but
+                                                             still could do
+                                                             with better rules
+                                                             here probably
+                                                             (see 22/2/08 notes)
+
+* Shape overlaps and general mess with 3_10 and pi helices included.
+
+* Some are still a complete mess with sheet overlaps etc. e.g 2HMG
+
+[ * handle insertion codes properly (see eg 1HVC which fails). Also
+    e.g. 2D26 (when using STRIDE, but not DSSP), and 1EAI (if using -35),
+    also e.g. 1ABI (crashes with STRIDE, diagram goes wrong with DSSP). 
+] DONE 21-22/6/08 
+
+[ * have use_longest_for_orientation to choose to use longest rather
+    than nearest strand in sheet for orientation. Currently using nearest
+    (using longest makes 2PEE-3 different from other serpins (1QLP, 1MTP, etc.)
+    for example, due to very bent longest strand in large sheet).
+] OUT OF DATE, CHANGED (prior to 2/3/08), but next point still valid:
+  Maybe should use strand with best fitting axis for orientation instead?
+
+* still some cases where strand position is wrong e.g. 2ANT-2 [is this
+  still the case] but definitely 2BUK (strand 7 should be in line with strand
+  6 not strand 3; see notes 21/2/08).
+
+* overlaps between helix clusters and aligned (non-cluster) helices, 
+  not always resolved by Dunnart
+  (e.g. 1HJR, 2GN0-3, 2GN1, 2GN2). Also 2QP2 (when multidomain, resolved
+  if only 2QP2-1)
+
+* Will not work when a domain contains multiple segments of a chain
+  with in-between segments in other domains. (Will then need multiple
+  pseudo- N- and C- terminus nodes in a single chain in the domain(s)).
+  Does not currently happen with DDOMAIN, CATH but could happen in general
+  with other domain decomposition methods. (Also inelegance/inefficiency
+  in finding the interdomain connections)
+
+* For helix labeling A,B,etc. need to got to AA,AB,etc. when more than 26.
+
+* color gradient restarts for each chain for single domains, but when
+  multidomain is used, gradient continues along whole protein (across
+  chains and domains). Should make this consistent one way or the other.
+
+* make restarting of labels (and color gradient) at each domain in multidomain
+  cartoons an option, instead of always numbering and coloring across domains
+  with no restart.
+
+* now that multidomain cartoons are available, need to change helix cluster
+  coloring so that there are different colors in different domains
+  (since nearby clusters in one domain are red, and so are those in another
+   but the two domains are not near each other).
+
+[ * fix residue/seqnum hovertext on interdomain connectors - currently connectors
+   to/from pseudo-termini have residues but interdomain connectors (when used
+   instead of pseudo-termini) do not have any residue information.
+] DONE 23/6/08.
+
+* assertion failure (obj2.isalpha()) in calc_sheet_dist_matrix() on 1K73.pdb.
+  Also 1VQ8 (nb also very slow on this one - very large structure, no 
+  domain decompositino from DDOMAIN) (using test rev1549:1551)
+
+* tricky problem with helix cluster proximity clustering, can get two
+  clusters with default color that are not actually prxomimate due to
+  creation of single-helix cluster e.g. in 1SEO 
+  (../ptgraph2.py -v  -r -35 -k fuchsia -e auto -uw ~/pdb/1SEO.pdb)
+  single-helix cluster Da (close to Aa,Ba,Ca) should cause default color
+  cluster Ea,Fa,Ga also to be red (close to Da) (maybe? - may not also 
+  be close to Aa,Ba,Ca?) but instead Ea,Fa,Ga and Kb,Jb,Ib,Hb are
+  same color (deafult color (fuchsia)) even though they are not prxomiate.
+
+
+[ * crash on 1PJS (attribute error line 2108 ptgraph2.py)
+  with no domain decomposition, using distance matrix not
+  heuristics. (only charikar:1080 (rev 1549:1551),
+  not charikar:2080 (rev 1457) where it works, and
+  gives a very big and hugely messy diagram). (26/08/08) ] FIXED 22/10/08
+
+
+[ * (found 20June09) foe separate labelling (helix labelling A,B,C,etc.)
+  find that when using PDB HELIX and SHEET cards to define SSEs, labelling
+  is in wrong order (ie.g. on 1HH1 (no pi/310) get helices labelld C,B,A
+  from N to C not A,B,C. ] FIXED 12/09/09.
+
+ * if strands/helices are coloured black, make the text label colour for
+   those ones white (currently get black on black so unreadable).
+
+ * AssertionError: /local/munk/proorigami-test/ptgraph/ptgraph2.py", line 6084, in build_in terdomain_connectors 
+   when using CATH domain decomposition e.g. on 16GS
+   also (related?) ERROR: SSE in more than 2 domains e.g. on 1A1V
+   (using CATH domain decomp, and options -uw)
+
+ * File "/local/munk/proorigami-test/ptgraph/ptgraph2.py", line 6085, in build_interdomain_connectors
+  assert(seqnum_diff >= -2) # NB can be -2 as +-1 'fake' resnum
+  AssertionError 
+  when using DDomain on e.g. 2A1S and options -uw
+
+ * 3MGB seems to cause ptgraph2.py to loop (12 hours+ then killed) when run
+   with -r35 -t dssp -k purple -l crossing:black,red,green,navy,blue -b sequential -j -e auto -f auto -o gradient -p cath:/local/munk/proorigami-test/cath/CathDomall.v3.3.0
+   problem related to WARNING: residue 391 (chain D) not found. May be HETATM.
+
+
+Changes
+-------
+
+. [  Instead of rainbow (index) coloring, color by chain:
+    - color the lines a different color for each chain (dark colors only: 
+      black, blue, magenta, purple etc.) ] DONE 28/1/08
+
+. [  color helix clusters one color, sheets another. I.e. color the actual 
+     helices and strands this color (simplified coloring scheme). ] DONE 28/1/08
+
+. [ color (shade) different cluster of helices that are actually close by in 
+    3d space the same color. e.g. E helix and B,C,D helix cluster in 
+    native state serpin 1SNG. ] DONE 13/2/08 although there are problems to be
+                                resolved, see comments in code and notes 
+                                12-16/2/08. Also need to decide whether
+                                this should be shading (cluster background)
+                                or shape fill coloring.
+
+. [ Eliminate chain id in numbering, just number all SSEs sequentially 
+    (not restarting for each chain). ] DONE 28/1/08
+
+. [ 2QP2: when using no domain decomposition, C terminal domain gets mixed 
+    up in the other domain. For this option (no domains) should, rather than 
+    operating on the whole protein, still do the domain decomposition and 
+    operate on the domains separately, and then put all domains on the same 
+    diagram. ] DONE 25/2/08-28/2/08
+
+. think about some other way to indicate unrolled barrels (asterisk on 
+label is not very obvious).
+
+. try relative placement of helices in cluster by projection onto plane
+  normal to mutual perpendicular to axes rather than current method relying
+  on dihedral angle with nearby sheet strands as reference.
+  (See notebook 1/2/08 - 8/2/08 on tableau angles, axis fitting etc.)
+
+. Check for axis coplanarity in tableau computation.
+
+. Allow use of different NMR models, and compare results to make sure
+  different models give same/similar cartoon.
+
+. Implement sandwich detection by strand centroid distance
+   as per notes 26-27/02/08 and compare with
+  'unfolding hinge' heuristic implemented 02/03/08.
+
+. related to above, maybe should enforce above/below rather than left/right
+  relative placement of sandwich-like folds when detected (e.g. 4RHV which
+  is currently placed left/right)
+
+. Handle COMPND record CHAIN entries to detect duplicated/symmetric chains
+  i.e. chain ids on the CHAIN entry are duplicates, only use the first one?
+  (Kian's pdb.py handles this).
+
+* Draw a dotted line box around domains on multidomain cartoons.
+
+[ * Adjust line width. Difficult to do in Dunnart editor currently, but easy
+    enough on webserver by adjusting SVG attributes. ] DONE 22/4/08.
+
+[ * option to disable labels on SSEs. ] DONE 21/4/08.
+
+[ * Option to color each sheet (the actual strands, not the cluster background
+    shading) a different color. ] DONE 23/4/08.
+
+[ * Send command to browser to fit SVG in window (see
+    adaptagrams.sourceforge net). ] DONE 18/4/08.
+
+[ * Try to detect non-SVG capable browsers (like current versions of Internet
+   Explorer?) and notify user that SVG not available and advanced
+   features (such as immediately following) are not available.
+] DONE 27/6/08.
+
+[ * Drop-down menu to select colors. Provide list of colors to select from,
+  or (more advanced) have "interactive" SVG by embedding JavaScript
+  to allow setting of colors there. ] DONE (simple only) 25/4/08.
+
+[ * add PDF output option. ] DONE 21/4/08.
+
+[ * move shading options to SSE color options group. ] DONE 21/4/08.
+
+[ * separate clustering options and add a new "labelling" title for SSE label
+  options. ] DONE 21/4/08.
+
+[  * indication (different color/shape) for pi and 3_10 helices. ] DONE 17/6/08
+
+  * rearrange code so properly separted into directories, library type
+    modules (ptnode.py, getdomains.py, etc.) in a subdirectory so
+    can be imported from there and users of them in separate directories
+    (ptgraph2 (pro-origami), pytableaucreate, pttabmatchpbool, etc.)
+    since these are really all different programs and should not just
+    all sit in ptgraph2 directory (they were just there as it was easy
+    at the time for them all to share modules that way).
+
+  * replace Bio.PDB parsing (and probably my DSSP and STRIDE parsing) with
+    Kian's smaller and simpler (and probably less buggy) PDB.py module
+    (which will sort out the insertion code problems, and optionally
+    remove crystal symmetry chains for example).
+
+  * add more colors to the color lookup table, not just the 16 HTML colors
+    (e.g. use /usr/X11R6/lib/X11/rgb.txt)
+
+  * (since fixing insertino code) noticed that sometimes STRIDE reports
+    H bonds to residues that don't exist, seems that possibly just the
+    chain identifier is wrong (bonds between chains)? E.g. 1EAI, 1ABI.
+
+  * Make sure Jmol secondary structure assignment matches Pro-origami
+  
+  * Make Jmol color scheme match Pro-origami, including color matching
+    for gradient, and same colors for all other color schemes.
+
+[  * User-selected colors must have options to add more colors for extra
+    items (not just the hardcoded set of 5 each so far) and also RGB 
+    user-settable options. Need to use JavaScript to make dynamic content
+    for this.
+] DONE 27/6/08 (RGB done 28/6/08)
+
+   * new JavaScript stuff does not work on IE6. (too hard to bother - wasted
+     2 days trying to get it work work)?
+
+   * direction indicator (arrow, or use convex/concave ends as in/out side?)
+     on helices.
+
+
+
+Enhancements
+------------
+Apart from bug fixes for assertion failures, TableauCreator problems, Dunnart
+fixes (connector nudging etc.)
+
+0. Comparison with as many hand-drawn ones as possible to identify what needs
+   to be changed.     
+1.[  Helix clustering (James). ] DONE
+2. interactive 'unfolding' of picture from 3d to 2d (Kim, Tim, Michael)
+3. Alternative uses of color gradient (other than sequence position):
+   a. B-factor (from PDB) (Ash)
+   b. deviation of sheet from planarity (Noel etc. at cancer genomics group)
+4. Show turns/coil somehow (Noel, etc. at cancer genomics group).
+   Somehow automatically identifying 'important' loop regions (eg RCL
+   on intact serpins) would be interesting. (see notes 19/2/08).
+5. Automatically draw a line to show significant sheet bending, using the axis
+   fitting. Like the 'bend point in sheet' line in the top secret diagram. (me)
+5a. Also a 'fold line' between sheets that have been 'unfolded' by beta
+    sandwich-like heurstic. (James).
+[ 6. Hover text showing residues. ]  DONE 1/5/2008 (basic version)
+7. Use SVG color gradient on shapes 
+   (see ptgraph/demo/svgexamples/cologradient.svg)
+8. (Arun) represent beta bulges.
+9. (Arun 26/08/08) needs to work better on all-alpha domains. 
+   Treat all contacts between SSEs like those between strands in sheets
+   i.e. SSEs in contacts grouped together.
+10 (James 18/9/08) 'fold' color scheme (see notes/emails/foldcolor.jw.email.txt)
+   As of 19/9/08 implemented simple version for strands in sheet only but
+   need to:
+       . also do it for helix clusters
+       [ select maximally contrasting colors (see refs in code comments) ] DONE 1/10/2008
+       . decide whetehr any coil region is good enough (currently done)
+         or if only actual 'turns' or 'short' coil regions should be used to
+         consider as connected
+       . fix bug with pi and 3_10 helices: when they are not included, still get
+         different colors on strands separated by them (as they are still
+         in internal data structures, just not shown on cartoon - need
+         to ignore them when they are not selected to be shown).
+
