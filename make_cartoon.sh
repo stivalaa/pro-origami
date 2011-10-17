@@ -48,7 +48,12 @@ for svgfile in $filelist ; do
     (ulimit -t ${DUNNART_CPUTIME_LIMIT} ; $DUNNART $DUNNART_OPTS ${svgfile} ) > /dev/null 2>&1 
     if [ $? -ne 0 ]; then
         echo dunnart failed on $svgfile >&2
-    else
+     else
+        cp $svgfile ${svgfile}.orig
+    fi
+done
+restore_list=""
+for svgfile in $filelist ; do
         overlapcount=`grep count $svgfile | sed 's/.*count="\([0-9]*\).*/\1/'`
         orig_overlapcount=$overlapcount
         echo "overlap count for $svgfile (default) is $overlapcount"
@@ -73,21 +78,19 @@ for svgfile in $filelist ; do
         done
         # if there was no improvement, just use default gapsize version
         if [ $overlapcount -ge $orig_overlapcount ]; then
-            ptgraph2.py $PTGRAPH2_OPTIONS $pdbfile > $tmpfile
-            if [ $? -ne 0 ]; then
-                echo "ptgraph2.py failed"
-                rm $tmpfile
-                exit 9
-            fi
-            (ulimit -t ${DUNNART_CPUTIME_LIMIT} ; $DUNNART $DUNNART_OPTS ${svgfile} ) > /dev/null 2>&1
-            if [ $? -ne 0 ]; then
-                echo dunnart failed on $svgfile >&2
-            fi
-            overlapcount=`grep count $svgfile | sed 's/.*count="\([0-9]*\).*/\1/'`
-            echo "going back to to default gapsize (overlap count $overlapcount) for $svgfile"
+            old_overlapcount=`grep count ${svgfile}.orig | sed 's/.*count="\([0-9]*\).*/\1/'`
+            echo "going back to to default gapsize (overlap count $old_overlapcount) for $svgfile"
+            restore_list="${restore_list} ${svgfile}"
         fi
-        svg2png.sh $svgfile
-    fi
+done
+
+for restore_file in $restore_list ; do
+    cp ${restore_file}.orig ${restore_file}
+done
+
+for svgfile in $filelist ; do
+    svg2png.sh $svgfile
+    rm ${svgfile}.orig
 done
 
 rm $tmpfile
