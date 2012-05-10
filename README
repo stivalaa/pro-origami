@@ -173,34 +173,3 @@ ADS
 Tue Jan  1 14:40:35 EST 2008
 $Id: README 3421 2010-03-10 03:39:37Z alexs $
 
-
-ptgraph.py (OBSOLETE)
-----------
-
-ptgraph.py is a program to draw two-dimensional graph representations of
-protein topology. It reads information from a PDB file and writes a graph
-rpresentation of the topological structure.
-
-It is written in Python and depends on some Python libraries:
-
-. pymmLib: python macromolecular library (1.0.0) http://pymmlib.sourceforge.net
-  Painter and Merritt 2004 "mmLib Python toolkit for manipulating annotated
-  structural models of biological macromolecules" J. Appl. Cryst. 37:174-178.
-
-. pydot: python interface to GraphViz (0.9.10) http://dkbza.org/pydot.html
-
-(note these libraries themselves depend on other libraries, e.g. numpy,
-these transitive dependencies are not listed here).
-
-GraphViz itself is also required (http://www.research.att.com/sw/tools/graphviz)
-
-
-Need to use DSSP or STRIDE to get secondary structure then other algorithms
-to get supersecondary structure (group strands into sheets etc.). But for
-now we assume there are HELIX and SHEET records in the PDB and use that
-to define the structure.
-
-Due to mmLib (and another half-dozen libraries I looked at) basically having
-far too many problems (mmLib seems to fail to build data structures from 
-SHEET records on most PDB files for instance) ptgraph.py reprsents a
-now abandoned approach.
