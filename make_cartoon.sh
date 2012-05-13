@@ -71,9 +71,11 @@ for svgfile in $filelist ; do
             (ulimit -t ${DUNNART_CPUTIME_LIMIT} ; $DUNNART $DUNNART_OPTS ${svgfile} ) > /dev/null 2>&1 
             if [ $? -ne 0 ]; then
                 echo dunnart failed on $svgfile >&2
+                overlapcount=999999 # force 'no improvement' case
+            else
+                overlapcount=`grep count $svgfile | sed 's/.*count="\([0-9]*\).*/\1/'`
+                echo "overlap count for $svgfile (-g $gapsize) is $overlapcount"
             fi
-            overlapcount=`grep count $svgfile | sed 's/.*count="\([0-9]*\).*/\1/'`
-            echo "overlap count for $svgfile (-g $gapsize) is $overlapcount"
             gapsize=`expr $gapsize + 1`
         done
         # if there was no improvement, just use default gapsize version
