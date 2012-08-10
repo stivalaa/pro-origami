@@ -552,7 +552,7 @@ def main():
                 sys.stdout.write('\ndomain ' + str(i) + ':\n')
 
             if fortran_format:
-                sys.stdout.write("%7s %4d\n" % (pdbid.upper(), n))
+                sys.stdout.write("%7.7s %4d\n" % (pdbid.upper(), n))
 
             if use_old_format:
                 if build_distance_matrix:
